@@ -7,30 +7,24 @@
             const searchKeys = removeDup(Array.from(memoryData.values()).flat());
             const fuse = new Fuse(searchKeys, { includeScore: true, keys: Array.from(memoryData.keys()) });
 
-            function removeExistingResult() {
-                const res = document.getElementById('result');
-                while (res.hasChildNodes()) {
-                    res.removeChild(res.firstChild);
-                }
-            }
-
-            function showNoResult() {
-                const textNode = document.createElement('p')
-                    textNode.style.fontWeight = 'bold';
-                    textNode.style.fontSize = '1.5rem';
-                    textNode.textContent = `无记录`;
-
-                    const divNode = document.createElement('div')
-                    divNode.align = 'center';
-                    divNode.appendChild(textNode)
-                    document.getElementById('result').appendChild(divNode)
-            }
-
             function showResult() {
                 removeExistingResult();
 
                 const key = document.getElementById('inp')
-                const bestMatch = fuse.search(key.value)[0]?.item;
+                const fuzzMatches = fuse.search(key.value);
+
+                const fuzzItems = fuzzMatches.map(e => e.item);
+                if (fuzzItems.length === 0) {
+                    createPara('未搜寻到结果');
+                    return;
+                }
+                if (fuzzItems.length > 1 && fuzzMatches[0].score > 0) {
+                    createPara(['模糊搜寻到多个结果：可使用下列完整名再次查询', '', '', ...fuzzItems]);
+                    return;
+                }
+
+                const bestMatch = fuzzMatches[0].item;
+
                 if (!bestMatch) {
                     showNoResult()
                     return;
@@ -65,10 +59,40 @@
                     divNode.appendChild(imgNode);
 
                     document.getElementById('result').appendChild(divNode)
-
-                    // console.log(textNode)
-                    // console.log(imgNode)
                 });
+
+                function removeExistingResult() {
+                    const res = document.getElementById('result');
+                    while (res.hasChildNodes()) {
+                        res.removeChild(res.firstChild);
+                    }
+                }
+
+                function showNoResult() {
+                    const textNode = document.createElement('p')
+                        textNode.style.fontWeight = 'bold';
+                        textNode.style.fontSize = '1.5rem';
+                        textNode.textContent = `无记录`;
+
+                        const divNode = document.createElement('div')
+                        divNode.align = 'center';
+                        divNode.appendChild(textNode)
+                        document.getElementById('result').appendChild(divNode)
+                }
+
+                function createPara(ts) {
+                    ts.forEach(t => {
+                        const textNode = document.createElement('p')
+                        textNode.style.fontWeight = 'bold';
+                        textNode.style.fontSize = '1.5rem';
+                        textNode.textContent = t
+
+                        const divNode = document.createElement('div')
+                        divNode.align = 'center';
+                        divNode.appendChild(textNode)
+                        document.getElementById('result').appendChild(divNode)
+                    })
+                }
             }
         </script>
     </head>

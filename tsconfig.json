@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+      "module": "es2020",
+      "target": "es2020",
+      "sourceMap": true,
+      "paths": {
+        "fuse": ["./node_modules/fuse.js/dist/fuse.js"]
+      }
+    },
+    "files": [
+      "main.ts"
+    ]
+  }

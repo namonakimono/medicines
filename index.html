@@ -1,0 +1,82 @@
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+        <script src="./main.js"></script>
+        <script>
+            const searchKeys = removeDup(Array.from(memoryData.values()).flat());
+            const fuse = new Fuse(searchKeys, { includeScore: true, keys: Array.from(memoryData.keys()) });
+
+            function removeExistingResult() {
+                const res = document.getElementById('result');
+                while (res.hasChildNodes()) {
+                    res.removeChild(res.firstChild);
+                }
+            }
+
+            function showNoResult() {
+                const textNode = document.createElement('p')
+                    textNode.style.fontWeight = 'bold';
+                    textNode.style.fontSize = '1.5rem';
+                    textNode.textContent = `无记录`;
+
+                    const divNode = document.createElement('div')
+                    divNode.align = 'center';
+                    divNode.appendChild(textNode)
+                    document.getElementById('result').appendChild(divNode)
+            }
+
+            function showResult() {
+                removeExistingResult();
+
+                const key = document.getElementById('inp')
+                const bestMatch = fuse.search(key.value)[0]?.item;
+                if (!bestMatch) {
+                    showNoResult()
+                    return;
+                }
+
+                const group = memoryData.get(bestMatch)
+                {
+                    const textNode = document.createElement('p')
+                    textNode.style.fontWeight = 'bold';
+                    textNode.style.fontSize = '1.5rem';
+                    textNode.textContent = `总计：${group.length}`
+
+                    const divNode = document.createElement('div')
+                    divNode.align = 'center';
+                    divNode.appendChild(textNode)
+                    document.getElementById('result').appendChild(divNode)
+                }
+
+                group.forEach(e => {
+                    const divNode = document.createElement('div');
+                    divNode.align = 'center';
+                    const textNode = document.createElement('p')
+                    textNode.style.fontWeight = 'bold';
+                    textNode.style.fontSize = '1.25rem';
+                    textNode.textContent = e.toString()
+
+                    const imgNode = document.createElement('img');
+                    imgNode.src = `./pic/${e}.jpg`;
+                    imgNode.width = '480';
+
+                    divNode.appendChild(textNode);
+                    divNode.appendChild(imgNode);
+
+                    document.getElementById('result').appendChild(divNode)
+
+                    // console.log(textNode)
+                    // console.log(imgNode)
+                });
+            }
+        </script>
+    </head>
+    <body>
+        <div style="text-align: center;">
+            <input id="inp" value="红霉素" style="font-size: 1.25rem;"/>
+            <button onclick="showResult()" style="font-size: 1.1rem;padding-left: 12px;padding-right: 12px;">查找</button>
+        </div>
+        <div id="result">
+        </div>
+    </body>
+</html>
